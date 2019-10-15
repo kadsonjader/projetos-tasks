@@ -4,9 +4,6 @@ const server = express();
 
 server.use(express.json());
 
-//
- 
-
 const projects = [];
 
 // Rota para chamar todos usuarios
@@ -53,7 +50,6 @@ server.get('/projects', (req, res) => {
     return res.send();
   });
   
- 
   server.post('/projects/:id/tasks',  (req, res) => {
     const { id } = req.params;
     const { title } = req.body;
