@@ -4,27 +4,49 @@ const server = express();
 
 server.use(express.json());
 
-const projects = [];
+let numberoRequisicoes = 0;
+const projetos = [];
+
+function projetoExiste(req, res, next) {
+  const { id } = req.params;
+  const projeto = projetos.find(p => p.id == id);
+
+  function contagemDeRequisicao(req, res, next) {
+    numberoRequisicoes++;
+  
+    console.log(`Número de requisições: ${numberoRequisicoes}`);
+  
+    return next();
+  }
+  
+  server.use(contagemDeRequisicao);
 
 // Rota para chamar todos usuarios
 
 server.get('/projects', (req, res) => {
-    return res.json(projects);
+    return res.json(projetos);
   });
+
+  if (!projeto) {
+    return res.status(400).json({ error: 'Projeto não encontrado' });
+  }
+
+  return next();
+}
   
   //Rota para cadastrar usuarios
-  server.post('/projects', (req, res) => {
+  server.post('/projects', projetoExiste, (req, res) => {
     const { id, title } = req.body;
   
-    const project = {
+    const projeto = {
       id,
       title,
       tasks: []
     };
   
-    projects.push(project);
+    projetos.push(projeto);
   
-    return res.json(project);
+    return res.json(projeto);
   });
 
   // rota para editar usuarios
@@ -33,32 +55,32 @@ server.get('/projects', (req, res) => {
     const { id } = req.params;
     const { title } = req.body;
   
-    const project = projects.find(p => p.id == id);
+    const projeto = projetos.find(p => p.id == id);
   
-    project.title = title;
+    projetos.title = title;
   
-    return res.json(project);
+    return res.json(projeto);
   });
   
   server.delete('/projects/:id',  (req, res) => {
     const { id } = req.params;
   
-    const projectIndex = projects.findIndex(p => p.id == id);
+    const projectIndex = projetos.findIndex(p => p.id == id);
   
     projects.splice(projectIndex, 1);
   
     return res.send();
   });
   
-  server.post('/projects/:id/tasks',  (req, res) => {
+  server.post('/projects/:id/tasks', projetoExiste, (req, res) => {
     const { id } = req.params;
     const { title } = req.body;
   
-    const project = projects.find(p => p.id == id);
+    const projeto = projetos.find(p => p.id == id);
   
     project.tasks.push(title);
   
-    return res.json(project);
+    return res.json(projeto);
   });
 
 server.listen(3002);
