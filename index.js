@@ -7,11 +7,11 @@ server.use(express.json());
 let numberoRequisicoes = 0;
 const projetos = [];
 
-function projetoExiste(req, res, next) {
+const projetoExiste = (req, res, next) => {
   const { id } = req.params;
   const projeto = projetos.find(p => p.id == id);
 
-  function contagemDeRequisicao(req, res, next) {
+  const contagemDeRequisicao = (req, res, next) => {
     numberoRequisicoes++;
   
     console.log(`Número de requisições: ${numberoRequisicoes}`);
@@ -67,7 +67,7 @@ server.get('/projects', (req, res) => {
   
     const projectIndex = projetos.findIndex(p => p.id == id);
   
-    projects.splice(projectIndex, 1);
+    projetos.splice(projectIndex, 1);
   
     return res.send();
   });
