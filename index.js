@@ -78,7 +78,7 @@ server.get('/projects', (req, res) => {
   
     const projeto = projetos.find(p => p.id == id);
   
-    project.tasks.push(title);
+    projeto.tasks.push(title);
   
     return res.json(projeto);
   });
