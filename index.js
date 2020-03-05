@@ -21,7 +21,7 @@ const projetoExiste = (req, res, next) => {
   
   server.use(contagemDeRequisicao);
 
-// Rota para chamar todos usuarios
+// Rota para chamar todos projetos
 
 server.get('/projects', (req, res) => {
     return res.json(projetos);
@@ -34,7 +34,7 @@ server.get('/projects', (req, res) => {
   return next();
 }
   
-  //Rota para cadastrar usuarios
+  //Rota para cadastrar Projetos
   server.post('/projects', projetoExiste, (req, res) => {
     const { id, title } = req.body;
   
@@ -49,7 +49,7 @@ server.get('/projects', (req, res) => {
     return res.json(projeto);
   });
 
-  // rota para editar usuarios
+  // rota para editar projetos
   
   server.put('/projects/:id',  (req, res) => {
     const { id } = req.params;
