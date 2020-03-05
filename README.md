@@ -1,4 +1,4 @@
-<img src="images/logo.png" height="200px" align="right"/>
+<img src="assets/images/logo.png" height="200px" align="right"/>
 
 # Projetos-Tasks
 

@@ -4,83 +4,105 @@ const server = express();
 
 server.use(express.json());
 
-let numberoRequisicoes = 0;
-const projetos = [];
 
-const projetoExiste = (req, res, next) => {
+const projects = [];
+
+/**
+ * Middleware que checa se o projeto existe
+ */
+function checkProjectExists(req, res, next) {
   const { id } = req.params;
-  const projeto = projetos.find(p => p.id == id);
+  const project = projects.find(p => p.id == id);
 
-  const contagemDeRequisicao = (req, res, next) => {
-    numberoRequisicoes++;
-  
-    console.log(`Número de requisições: ${numberoRequisicoes}`);
-  
-    return next();
-  }
-  
-  server.use(contagemDeRequisicao);
-
-// Rota para chamar todos projetos
-
-server.get('/projects', (req, res) => {
-    return res.json(projetos);
-  });
-
-  if (!projeto) {
-    return res.status(400).json({ error: 'Projeto não encontrado' });
+  if (!project) {
+    return res.status(400).json({ error: 'Project not found' });
   }
 
   return next();
 }
-  
-  //Rota para cadastrar Projetos
-  server.post('/projects', projetoExiste, (req, res) => {
-    const { id, title } = req.body;
-  
-    const projeto = {
-      id,
-      title,
-      tasks: []
-    };
-  
-    projetos.push(projeto);
-  
-    return res.json(projeto);
-  });
 
-  // rota para editar projetos
-  
-  server.put('/projects/:id',  (req, res) => {
-    const { id } = req.params;
-    const { title } = req.body;
-  
-    const projeto = projetos.find(p => p.id == id);
-  
-    projetos.title = title;
-  
-    return res.json(projeto);
-  });
-  
-  server.delete('/projects/:id',  (req, res) => {
-    const { id } = req.params;
-  
-    const projectIndex = projetos.findIndex(p => p.id == id);
-  
-    projetos.splice(projectIndex, 1);
-  
-    return res.send();
-  });
-  
-  server.post('/projects/:id/tasks', projetoExiste, (req, res) => {
-    const { id } = req.params;
-    const { title } = req.body;
-  
-    const projeto = projetos.find(p => p.id == id);
-  
-    projeto.tasks.push(title);
-  
-    return res.json(projeto);
-  });
+/**
+ * Middleware que dá log no número de requisições
+ */
+function logRequests(req, res, next) {
+
+  console.count("Número de requisições");
+
+  return next();
+}
+
+server.use(logRequests);
+
+/**
+ * Retorna todos os projetos
+ */
+server.get('/projects', (req, res) => {
+  return res.json(projects);
+});
+
+/**
+ * Request body: id, title
+ * Cadastra um novo projeto
+ */
+server.post('/projects', (req, res) => {
+  const { id, title } = req.body;
+
+ 
+
+  const project = {
+    id,
+    title,
+    tasks: []
+  };
+
+  projects.push(project);
+
+  return res.json(project);
+});
+
+/**
+ * Route params: id
+ * Request body: title
+ * Altera o título do projeto com o id presente nos parâmetros da rota.
+ */
+server.put('/projects/:id', checkProjectExists, (req, res) => {
+  const { id } = req.params;
+  const { title } = req.body;
+
+  const project = projects.find(p => p.id == id);
+
+  project.title = title;
+
+  return res.json(project);
+});
+
+/**
+ * Route params: id
+ * Deleta o projeto associado ao id presente nos parâmetros da rota.
+ */
+server.delete('/projects/:id', checkProjectExists, (req, res) => {
+  const { id } = req.params;
+
+  const projectIndex = projects.findIndex(p => p.id == id);
+
+  projects.splice(projectIndex, 1);
+
+  return res.send();
+});
+
+/**
+ * Route params: id;
+ * Adiciona uma nova tarefa no projeto escolhido via id; 
+ */
+server.post('/projects/:id/tasks', checkProjectExists, (req, res) => {
+  const { id } = req.params;
+  const { title } = req.body;
+
+  const project = projects.find(p => p.id == id);
+
+  project.tasks.push(title);
+
+  return res.json(project);
+});
 
 server.listen(3002);
